@@ -2,3 +2,10 @@
 _site/
 *.docx
 ~$*
+
+# 本地工作产物，不纳入仓库
+_ref/removed-images/
+_ref/before-dept-rename/
+_ref/merge-src/
+_ref/env-change-log.txt
+_ref/v3.4-media-archive/
