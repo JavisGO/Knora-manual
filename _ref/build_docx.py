@@ -16,26 +16,19 @@ def read(p):
 def regen_summaries():
     files = sorted(glob.glob(os.path.join(WIKI, "[0-9][0-9]-*.md")))
     demote = lambda s: re.sub(r"^(#{2,4}) ", lambda x: "#" * (len(x.group(1)) + 1) + " ", s.strip(), flags=re.M)
-    nimg = len(os.listdir(os.path.join(WIKI, "images")))
-    chg = ["# v3.4 → v4.0 变更清单\n", "> 全书用词：原「空间」统一改称「部门」（界面原文「个人空间」「默认企业空间」保留）。\n",
-           f"> 由各章末尾「本章变更说明」汇总；详细说明以各章为准。截图：`images/` 共 {nimg} 张（`-proto` 为 1130 版本原型示意）。\n"]
     tbc = ["# 待确认事项汇总\n", "> 由各章末尾「待确认」汇总，供产品/研发/用户逐条确认；确认后回到对应章节修改正文并删除该条。\n"]
     total = 0
     for f in files:
         t = read(f)
         name = os.path.basename(f)
         title = t.split("\n", 1)[0].lstrip("# ").strip()
-        m = re.search(r"^## 本章变更说明.*?\n(.*?)(?=^## 待确认)", t, re.S | re.M)
         m2 = re.search(r"^## 待确认.*?\n(.*)$", t, re.S | re.M)
-        if m:
-            chg.append(f"\n## {title}（[{name}]({name})）\n\n" + demote(m.group(1)).strip("-").strip() + "\n")
         if m2:
             body = m2.group(1).strip()
             n = len(re.findall(r"^\s*\d+\.\s", body, re.M))
             total += n
             tbc.append(f"\n## {title}（[{name}]({name})，{n} 条）\n\n" + demote(body) + "\n")
     tbc.insert(2, f"\n共约 {total} 条。\n")
-    open(os.path.join(WIKI, "CHANGELOG.md"), "w", encoding="utf-8").write("\n".join(chg))
     open(os.path.join(WIKI, "待确认汇总.md"), "w", encoding="utf-8").write("\n".join(tbc))
     return total
 
